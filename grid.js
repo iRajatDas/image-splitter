@@ -14,10 +14,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("fs/promises");
 const jimp_1 = __importDefault(require("jimp"));
+const axios_1 = __importDefault(require("axios"));
+function downloadImage(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield axios_1.default.get(url, {
+            responseType: "arraybuffer",
+        });
+        return Buffer.from(response.data, "binary");
+    });
+}
 function sliceImage(imagePath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const image = yield jimp_1.default.read(imagePath);
+            let image;
+            if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+                const imageBuffer = yield downloadImage(imagePath);
+                image = yield jimp_1.default.read(imageBuffer);
+            }
+            else {
+                image = yield jimp_1.default.read(imagePath);
+            }
             const width = image.getWidth();
             const height = image.getHeight();
             const sliceWidth = Math.floor(width / 2);
@@ -51,9 +67,9 @@ function sliceImage(imagePath) {
         }
     });
 }
-// Example usage
-const imagePath = "./merise_macmerise_vector_t-shirt_art_ready_for_print_colorful_gr_8e49bc34-e098-45eb-92c3-a23e90561e51.png";
-sliceImage(imagePath)
+// Example usage with a remote image URL
+const remoteImagePath = "merise_macmerise_vector_t-shirt_art_ready_for_print_colorful_gr_8e49bc34-e098-45eb-92c3-a23e90561e51.png";
+sliceImage(remoteImagePath)
     .then((slices) => {
     console.log("Image slices:");
     console.log(slices);

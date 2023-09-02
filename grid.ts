@@ -1,9 +1,24 @@
 import { writeFile } from "fs/promises";
 import Jimp from "jimp";
+import axios from "axios";
+
+async function downloadImage(url: string): Promise<Buffer> {
+  const response = await axios.get(url, {
+    responseType: "arraybuffer",
+  });
+  return Buffer.from(response.data, "binary");
+}
 
 async function sliceImage(imagePath: string): Promise<string[]> {
   try {
-    const image = await Jimp.read(imagePath);
+    let image: Jimp;
+
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      const imageBuffer = await downloadImage(imagePath);
+      image = await Jimp.read(imageBuffer);
+    } else {
+      image = await Jimp.read(imagePath);
+    }
 
     const width = image.getWidth();
     const height = image.getHeight();
@@ -45,11 +60,11 @@ async function sliceImage(imagePath: string): Promise<string[]> {
   }
 }
 
-// Example usage
-const imagePath =
-  "./merise_macmerise_vector_t-shirt_art_ready_for_print_colorful_gr_8e49bc34-e098-45eb-92c3-a23e90561e51.png";
+// Example usage with a remote image URL
+const remoteImagePath =
+  "merise_macmerise_vector_t-shirt_art_ready_for_print_colorful_gr_8e49bc34-e098-45eb-92c3-a23e90561e51.png";
 
-sliceImage(imagePath)
+sliceImage(remoteImagePath)
   .then((slices) => {
     console.log("Image slices:");
     console.log(slices);
