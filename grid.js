@@ -37,6 +37,10 @@ function sliceImage(imagePath) {
             }
             const width = image.getWidth();
             const height = image.getHeight();
+            if (width === height) {
+                console.log(`Skipping ${path_1.default.basename(imagePath)} due to incorrect dimensions.\n\nheight: ${height}\nwidth: ${width}`);
+                return [];
+            }
             const sliceWidth = Math.floor(width / 2);
             const sliceHeight = Math.floor(height / 2);
             console.log("Image Dimensions:", width, "x", height);
@@ -81,7 +85,6 @@ const remotePaths = [
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120619502682505256/Merise_A_penguine_holding_an_umbrella_wearing_a_3_piece_suite_i_ac0c2c2a-94e6-42f1-8669-937030a1aa82.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120619760267313243/Merise_A_penguine_holding_an_umbrella_wearing_a_3_piece_suite_i_f441d898-b85e-4e3b-9509-3d357af86bd2.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120619867599540254/Merise_A_penguine_holding_an_umbrella_wearing_a_3_piece_suite_i_8d01244f-1f37-4702-8f15-56c77ffb3a29.png",
-    "https://cdn.discordapp.com/attachments/1120340802879631400/1120620082721194004/Merise_A_penguine_holding_an_umbrella_wearing_a_3_piece_suite_i_a67c72bd-4c93-4d6f-85e1-41cd61f0bbb6.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120637333587374110/Merise_A_unique_3D_isometric_image_of_a_beautiful_scenery_from__1fa9899a-c02a-436d-8fa7-96701f323129.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120674936122523748/Merise_A_panda_eating_bamboo_in_sticker_style_with_solid_backgr_4ace94ea-24db-4091-94ea-5c03bfcd55d8.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1120675066817024160/Merise_A_panda_eating_bamboo_in_sticker_style_with_solid_backgr_82f9bd2a-6b38-4a86-946e-4df9bc76f101.png",
@@ -7059,7 +7062,7 @@ const remotePaths = [
     "https://cdn.discordapp.com/attachments/1120340802879631400/1144306938323148921/merise_macmerise_Couple_enjoying_sunrise_plain_black_background_42411ce3-8c91-4d73-8f91-ac19afb2b03a.png",
     "https://cdn.discordapp.com/attachments/1120340802879631400/1144307265151717376/merise_macmerise_Couple_reading_books_near_a_waterfall_plain_bl_7de665ef-009f-4a3b-b4e6-ae75b64ff4ac.png",
 ];
-for (let i = 0; i <= 10; i++) {
+for (let i = 500; i <= 510; i++) {
     sliceImage(remotePaths[i])
         .then((slices) => {
         console.log("Image slices:");

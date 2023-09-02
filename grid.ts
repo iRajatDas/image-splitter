@@ -23,6 +23,13 @@ async function sliceImage(imagePath: string): Promise<string[]> {
 
     const width = image.getWidth();
     const height = image.getHeight();
+
+    if (width === height) {
+      console.log(
+        `Skipping ${path.basename(imagePath)} due to incorrect dimensions.\n\nheight: ${height}\nwidth: ${width}`
+      );
+      return [];
+    }
     const sliceWidth = Math.floor(width / 2);
     const sliceHeight = Math.floor(height / 2);
 
@@ -7055,7 +7062,7 @@ const remotePaths = [
   "https://cdn.discordapp.com/attachments/1120340802879631400/1144307265151717376/merise_macmerise_Couple_reading_books_near_a_waterfall_plain_bl_7de665ef-009f-4a3b-b4e6-ae75b64ff4ac.png",
 ];
 
-for (let i = 0; i <= 10; i++) {
+for (let i = 500; i <= 510; i++) {
   sliceImage(remotePaths[i])
     .then((slices) => {
       console.log("Image slices:");
