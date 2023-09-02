@@ -11,6 +11,27 @@ async function downloadImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data, "binary");
 }
 
+(async () => {
+  for (let i = 0; i <= remotePaths.length; i++) {
+    try {
+      const slices = await sliceImage(remotePaths[i]);
+      const originalImageName = path.basename(
+        remotePaths[i],
+        path.extname(remotePaths[i])
+      );
+
+      if (slices.length > 0)
+        console.log(
+          `Generate ${slices.length} variants:`,
+          originalImageName,
+          "✅"
+        );
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+})();
+
 async function sliceImage(imagePath: string): Promise<string[]> {
   try {
     let image: Jimp;
@@ -34,6 +55,9 @@ async function sliceImage(imagePath: string): Promise<string[]> {
     const sliceWidth = Math.floor(width / 2);
     const sliceHeight = Math.floor(height / 2);
 
+    // console.log("Image Dimensions:", width, "x", height);
+    // console.log("Slice Dimensions:", sliceWidth, "x", sliceHeight);
+
     if (sliceWidth <= 0 || sliceHeight <= 0) {
       throw new Error("Invalid image dimensions");
     }
@@ -41,6 +65,7 @@ async function sliceImage(imagePath: string): Promise<string[]> {
     const outputRootFolder = "./output"; // Specify the root output folder path
     const originalImageName = path.basename(imagePath, path.extname(imagePath));
 
+    // Generate and save each image slice
     const slices: string[] = [];
     for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 2; j++) {
@@ -53,42 +78,21 @@ async function sliceImage(imagePath: string): Promise<string[]> {
         const sliceFilename = `${originalImageName}.png`;
         const sliceFilePath = path.join(variantFolderPath, sliceFilename);
 
+        // Create the variant folder if it doesn't exist
         await mkdir(variantFolderPath, { recursive: true });
 
+        // Save the slice image inside the variant folder
         await slice.writeAsync(sliceFilePath);
         slices.push(sliceFilePath);
       }
     }
 
+    // const jsonData = JSON.stringify(slices);
+
+    // await writeFile(path.join(outputRootFolder, "slices.json"), jsonData);
     console.log("Image slices saved to the output folders.");
     return slices;
   } catch (error) {
     throw new Error(`Image slicing failed: ${error}`);
   }
 }
-
-async function processImages() {
-  try {
-    const promises: Promise<string[]>[] = [];
-
-    for (const imagePath of remotePaths) {
-      promises.push(sliceImage(imagePath));
-    }
-
-    const slicesArrays = await Promise.all(promises);
-
-    for (const slices of slicesArrays) {
-      if (slices.length > 0) {
-        console.log(
-          `Generate ${slices.length} variants:`,
-          path.basename(slices[0]),
-          "✅"
-        );
-      }
-    }
-  } catch (err) {
-    console.error("Error:", err);
-  }
-}
-
-processImages();
