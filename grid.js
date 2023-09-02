@@ -25,19 +25,6 @@ function downloadImage(url) {
         return Buffer.from(response.data, "binary");
     });
 }
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    for (let i = 500; i <= 510; i++) {
-        try {
-            const slices = yield sliceImage(utils_1.remotePaths[i]);
-            const originalImageName = path_1.default.basename(utils_1.remotePaths[i], path_1.default.extname(utils_1.remotePaths[i]));
-            if (slices.length > 0)
-                console.log(`\n\n     =======     \nGenerate ${slices.length} variants for image name:`, originalImageName);
-        }
-        catch (err) {
-            console.error("Error:", err);
-        }
-    }
-}))();
 function sliceImage(imagePath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -52,19 +39,16 @@ function sliceImage(imagePath) {
             const width = image.getWidth();
             const height = image.getHeight();
             if (width === height || width !== 1856 || height !== 2464) {
-                console.log(`Skipping ${path_1.default.basename(imagePath)} due to incorrect dimensions.`);
+                console.log(`Skipping ${path_1.default.basename(imagePath)} due to incorrect dimensions. ❌`);
                 return [];
             }
             const sliceWidth = Math.floor(width / 2);
             const sliceHeight = Math.floor(height / 2);
-            // console.log("Image Dimensions:", width, "x", height);
-            // console.log("Slice Dimensions:", sliceWidth, "x", sliceHeight);
             if (sliceWidth <= 0 || sliceHeight <= 0) {
                 throw new Error("Invalid image dimensions");
             }
             const outputRootFolder = "./output"; // Specify the root output folder path
             const originalImageName = path_1.default.basename(imagePath, path_1.default.extname(imagePath));
-            // Generate and save each image slice
             const slices = [];
             for (let i = 0; i < 2; i++) {
                 for (let j = 0; j < 2; j++) {
@@ -75,15 +59,11 @@ function sliceImage(imagePath) {
                     const variantFolderPath = path_1.default.join(outputRootFolder, variantFolder);
                     const sliceFilename = `sliced_${i}_${j}_${originalImageName}.jpg`;
                     const sliceFilePath = path_1.default.join(variantFolderPath, sliceFilename);
-                    // Create the variant folder if it doesn't exist
                     yield (0, promises_1.mkdir)(variantFolderPath, { recursive: true });
-                    // Save the slice image inside the variant folder
                     yield slice.writeAsync(sliceFilePath);
                     slices.push(sliceFilePath);
                 }
             }
-            // const jsonData = JSON.stringify(slices);
-            // await writeFile(path.join(outputRootFolder, "slices.json"), jsonData);
             console.log("Image slices saved to the output folders.");
             return slices;
         }
@@ -92,3 +72,23 @@ function sliceImage(imagePath) {
         }
     });
 }
+function processImages() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const promises = [];
+            for (const imagePath of utils_1.remotePaths) {
+                promises.push(sliceImage(imagePath));
+            }
+            const slicesArrays = yield Promise.all(promises);
+            for (const slices of slicesArrays) {
+                if (slices.length > 0) {
+                    console.log(`Generate ${slices.length} variants:`, path_1.default.basename(slices[0]), "✅");
+                }
+            }
+        }
+        catch (err) {
+            console.error("Error:", err);
+        }
+    });
+}
+processImages();
