@@ -12,7 +12,7 @@ async function downloadImage(url: string): Promise<Buffer> {
 }
 
 (async () => {
-  for (let i = 500; i <= 510; i++) {
+  for (let i = 0; i <= remotePaths.length; i++) {
     try {
       const slices = await sliceImage(remotePaths[i]);
       const originalImageName = path.basename(
