@@ -11,6 +11,27 @@ async function downloadImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data, "binary");
 }
 
+(async () => {
+  for (let i = 500; i <= 510; i++) {
+    try {
+      const slices = await sliceImage(remotePaths[i]);
+      const originalImageName = path.basename(
+        remotePaths[i],
+        path.extname(remotePaths[i])
+      );
+
+      if (slices.length > 0)
+        console.log(
+          `Generate ${slices.length} variants:`,
+          originalImageName,
+          "✅"
+        );
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+})();
+
 async function sliceImage(imagePath: string): Promise<string[]> {
   try {
     let image: Jimp;
@@ -27,17 +48,15 @@ async function sliceImage(imagePath: string): Promise<string[]> {
 
     if (width === height || width !== 1856 || height !== 2464) {
       console.log(
-        `Skipping ${path.basename(
-          imagePath
-        )} due to incorrect dimensions.\n\nheight: ${height}\nwidth: ${width}`
+        `Skipping ${path.basename(imagePath)} due to incorrect dimensions. ❌`
       );
       return [];
     }
     const sliceWidth = Math.floor(width / 2);
     const sliceHeight = Math.floor(height / 2);
 
-    console.log("Image Dimensions:", width, "x", height);
-    console.log("Slice Dimensions:", sliceWidth, "x", sliceHeight);
+    // console.log("Image Dimensions:", width, "x", height);
+    // console.log("Slice Dimensions:", sliceWidth, "x", sliceHeight);
 
     if (sliceWidth <= 0 || sliceHeight <= 0) {
       throw new Error("Invalid image dimensions");
@@ -76,19 +95,4 @@ async function sliceImage(imagePath: string): Promise<string[]> {
   } catch (error) {
     throw new Error(`Image slicing failed: ${error}`);
   }
-}
-
-// Example usage with a remote image URL
-const remoteImagePath =
-  "https://media.discordapp.net/attachments/1120340802879631400/1136593116028219483/merise_macmerise_Electric_blue_octopus_strumming_a_guitar_on_a__14c515cc-9e82-4ce9-b488-53959dafa4ca.png";
-
-for (let i = 500; i <= 510; i++) {
-  sliceImage(remotePaths[i])
-    .then((slices) => {
-      console.log("Image slices:");
-      console.log(slices);
-    })
-    .catch((err) => {
-      console.error("Error:", err);
-    });
 }
