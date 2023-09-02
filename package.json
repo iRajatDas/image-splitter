@@ -1,0 +1,19 @@
+{
+  "name": "Splitter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "grid": "npx tsc && node ./grid.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.3.2",
+    "fs": "0.0.1-security",
+    "jimp": "^0.22.8",
+    "sharp": "^0.32.1",
+    "typescript": "^5.1.3"
+  }
+}
